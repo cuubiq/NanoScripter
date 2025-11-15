@@ -1,3 +1,6 @@
+.gitignore
+
+# Compiled class file
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -7,11 +10,20 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-# https://maven.apache.org/wrapper/#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
-# Eclipse m2e generated files
-# Eclipse Core
-.project
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
+# Files to ignore
+*.class
+*.log
+*.jar
+!*-sources.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS generated files
+.DS_Store
+.vscode/
