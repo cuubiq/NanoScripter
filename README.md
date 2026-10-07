@@ -1,39 +1,55 @@
-# 🚀 NanoScripter
+# NanoScripter
 
-**Runtime Kotlin/Java Script Loader für Purpur 1.21**
+**Runtime Kotlin and Java scripting for Purpur servers.**
 
-NanoScripter ermöglicht es dir, Minecraft-Plugins direkt auf dem Server in Kotlin oder Java zu schreiben - **ohne externe Build-Tools, ohne IntelliJ, ohne manuelle Kompilierung!**
+NanoScripter allows you to create and run Minecraft plugins directly on your server using Kotlin or Java — without an external IDE, build pipeline, or manual compilation workflow.
 
----
+Write your code, reload it, and keep developing directly inside your server environment.
 
-## ✨ Features
+## Features
 
-- 🔥 **Runtime-Kompilierung** - Scripts werden direkt auf dem Server kompiliert
-- 📝 **Kotlin & Java Support** - Schreibe Plugins in deiner bevorzugten Sprache
-- 🎯 **Vollständige Bukkit/Purpur API** - Alle Imports automatisch verfügbar
-- 🔄 **Hot-Reload** - Lade Plugins neu ohne Server-Neustart (`/ns reload`)
-- 📦 **Plugin-Struktur** - Jeder Ordner = Ein Plugin
-- 🎨 **Adventure API** - Moderne Text-Components sofort verfügbar
-- ⚡ **Kein IDE nötig** - Schreibe Code direkt auf dem Server
+* **Runtime compilation** — Compile scripts directly on the server
+* **Kotlin & Java support** — Choose the language you prefer
+* **Purpur / Bukkit API access** — Use the APIs available to your server
+* **Hot reload** — Reload scripts without restarting the server
+* **Plugin-based structure** — Each script directory represents a plugin
+* **Adventure API support** — Use modern components, MiniMessage, titles and more
+* **No IDE required** — Develop scripts directly on your server
+* **Lightweight workflow** — Ideal for prototyping and smaller server projects
 
----
+## Requirements
 
-## 📥 Installation
+* **Minecraft:** Purpur 1.21.10+
+* **Java:** 21
 
-1. **Download** die neueste `NanoScripter.jar` aus den [Releases](https://github.com/ItzCubiq/NanoScripter/releases)
-2. Lege die JAR in deinen `/plugins` Ordner
-3. Starte den Server
-4. Fertig! 🎉
+## Installation
 
----
+Download the latest `NanoScripter.jar` from the project's releases and place it into your server's `plugins` directory.
 
-## 📚 Verwendung
-
-### Plugin-Struktur
-
-Plugins werden im Ordner `/plugins/NanoScripter/` erstellt:
-
+```text
+server/
+└── plugins/
+    └── NanoScripter.jar
 ```
+
+Start or restart your server.
+
+NanoScripter will automatically create its required directories.
+
+## Getting Started
+
+Scripts are stored inside:
+
+```text
+plugins/
+└── NanoScripter/
+```
+
+Each subdirectory represents an individual script plugin.
+
+For example:
+
+```text
 plugins/
 └── NanoScripter/
     ├── welcomemessage/
@@ -44,139 +60,204 @@ plugins/
         └── main.java
 ```
 
-### Beispiel: Welcome Message Plugin
+This structure keeps individual scripts isolated and makes them easy to manage.
 
-Erstelle einen Ordner `/plugins/NanoScripter/welcomemessage/` und darin eine `main.kts`:
+## Kotlin
+
+Create:
+
+```text
+plugins/NanoScripter/welcomemessage/main.kts
+```
+
+Example:
 
 ```kotlin
 class WelcomeListener : Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         val playerName = event.player.name
-        val message = Component.text("§e$playerName §7ist dem Server beigetreten! §a✓")
+        val message = Component.text("$playerName joined the server.")
+
         event.joinMessage(message)
-        
-        event.player.sendMessage("§a§lWillkommen §7auf dem Server!")
+        event.player.sendMessage("Welcome to the server!")
     }
 }
 
-Bukkit.getPluginManager().registerEvents(WelcomeListener(), plugin)
-logger.info("Welcome Message Plugin wurde aktiviert")
+Bukkit.getPluginManager().registerEvents(
+    WelcomeListener(),
+    plugin
+)
+
+logger.info("Welcome Message Plugin enabled")
 ```
 
-### Beispiel: Custom Command Plugin
+## Commands
+
+Commands can be registered directly from your scripts.
+
+Example:
 
 ```kotlin
 class FlyCommand : CommandExecutor {
-    override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>): Boolean {
+    override fun onCommand(
+        sender: CommandSender,
+        command: Command,
+        label: String,
+        args: Array<String>
+    ): Boolean {
         if (sender !is Player) {
-            sender.sendMessage("§cNur Spieler können diesen Befehl nutzen!")
+            sender.sendMessage("Only players can use this command.")
             return true
         }
-        
+
         sender.allowFlight = !sender.allowFlight
-        sender.sendMessage(if (sender.allowFlight) "§aFly aktiviert!" else "§cFly deaktiviert!")
+
+        sender.sendMessage(
+            if (sender.allowFlight) {
+                "Flight enabled."
+            } else {
+                "Flight disabled."
+            }
+        )
+
         return true
     }
 }
 
 val command = Bukkit.getPluginCommand("fly")
 command?.setExecutor(FlyCommand())
-logger.info("Fly Command wurde registriert")
+
+logger.info("Fly command registered")
 ```
 
-### Beispiel: Java Plugin
+## Java
 
-`/plugins/NanoScripter/javaplugin/main.java`:
+NanoScripter also supports Java scripts.
+
+Create:
+
+```text
+plugins/NanoScripter/javaplugin/main.java
+```
+
+Example:
 
 ```java
 class MyListener implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        player.sendMessage("§aDu hast einen Block abgebaut!");
+        player.sendMessage("You broke a block.");
     }
 }
 
-Bukkit.getPluginManager().registerEvents(new MyListener(), plugin);
-logger.info("Java Plugin wurde aktiviert");
+Bukkit.getPluginManager().registerEvents(
+    new MyListener(),
+    plugin
+);
+
+logger.info("Java plugin enabled");
 ```
 
----
+## Commands
 
-## 🎮 Commands
+| Command      | Description                     | Permission            |
+| ------------ | ------------------------------- | --------------------- |
+| `/ns`        | Open the NanoScripter help menu | None                  |
+| `/ns reload` | Reload all scripts              | `nanoscripter.reload` |
+| `/ns list`   | List loaded scripts             | `nanoscripter.list`   |
+| `/ns help`   | Open the help menu              | None                  |
 
-| Command | Beschreibung | Permission |
-|---------|--------------|------------|
-| `/ns` | Zeigt das Hilfe-Menü | - |
-| `/ns reload` | Lädt alle Plugins neu | `nanoscripter.reload` |
-| `/ns list` | Zeigt alle geladenen Plugins | `nanoscripter.list` |
-| `/ns help` | Zeigt das Hilfe-Menü | - |
+Aliases:
 
-**Aliases:** `/nanoscripter`, `/ns`
+```text
+/nanoscripter
+/ns
+```
 
----
+## Available APIs
 
-## 📖 Verfügbare APIs
+NanoScripter provides access to the APIs available through the server environment.
 
-Alle folgenden APIs sind **automatisch importiert** und können direkt genutzt werden:
+### Bukkit / Spigot / Purpur
 
-### Bukkit/Spigot/Purpur
-- ✅ Events (Player, Block, Entity, Inventory, World, etc.)
-- ✅ Commands & TabCompletion
-- ✅ Scheduler & Tasks (BukkitRunnable)
-- ✅ Inventory & Items (ItemStack, Meta, Recipes)
-- ✅ Blocks & BlockData
-- ✅ Entities (Player, Mob, Animals, Monster, etc.)
-- ✅ Scoreboard & BossBars
-- ✅ Permissions
-- ✅ Configuration (FileConfiguration)
-- ✅ Enchantments & Potions
+* Events
+* Commands
+* Tab completion
+* Scheduler and tasks
+* Inventories
+* Items and ItemStacks
+* Blocks and BlockData
+* Entities
+* Scoreboards
+* BossBars
+* Permissions
+* Configuration
+* Enchantments
+* Potions
+* World APIs
 
-### Adventure API
-- ✅ Component (moderne Text-Components)
-- ✅ MiniMessage
-- ✅ Titles & ActionBars
-- ✅ BossBars
-- ✅ Sounds
+### Adventure
+
+* Components
+* MiniMessage
+* Titles
+* Action bars
+* BossBars
+* Sounds
 
 ### Java Standard Library
-- ✅ Collections (List, Map, Set, etc.)
-- ✅ UUID
-- ✅ File I/O
-- ✅ Time & Date (LocalDateTime, Duration, etc.)
-- ✅ Streams & Lambdas
 
----
+Standard Java functionality can also be used, including:
 
-## 🔧 Technische Details
+* Collections
+* Lists, Maps and Sets
+* UUID
+* File I/O
+* Date and time APIs
+* Streams
+* Lambdas
+* Utility classes
 
-- **Minecraft Version:** Purpur 1.21.10+
-- **Java Version:** 21
-- **Kotlin Version:** 1.9.22
-- **Build Tool:** Maven
-- **Dependencies:**
-  - Kotlin Compiler Embeddable
-  - Purpur API
-  - Adventure API
+## Hot Reload
 
----
+One of NanoScripter's core features is runtime reloading.
 
-## 🛠️ Development
+After modifying a script, run:
 
-### Projekt builden
+```text
+/ns reload
+```
+
+NanoScripter will reload the available scripts without requiring a full server restart.
+
+This makes NanoScripter particularly useful for rapid development, testing and prototyping.
+
+## Development
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/ItzCubiq/NanoScripter.git
 cd NanoScripter
+```
+
+Build the project using Maven:
+
+```bash
 mvn clean package
 ```
 
-Die fertige JAR findest du unter `target/NanoScripter-1.0.0.jar`
+The compiled JAR will be available in:
 
-### Projekt-Struktur
-
+```text
+target/NanoScripter-1.0.0.jar
 ```
+
+## Project Structure
+
+```text
 NanoScripter/
 ├── src/
 │   └── main/
@@ -198,46 +279,84 @@ NanoScripter/
 └── README.md
 ```
 
+## Technology
+
+| Component  | Version         |
+| ---------- | --------------- |
+| Minecraft  | Purpur 1.21.10+ |
+| Java       | 21              |
+| Kotlin     | 1.9.22          |
+| Build Tool | Maven           |
+
+### Dependencies
+
+* Kotlin Compiler Embeddable
+* Purpur API
+* Adventure API
+
+## Use Cases
+
+NanoScripter is useful for quickly building:
+
+* Custom commands
+* Home and warp systems
+* Combat mechanics
+* Anti-griefing tools
+* Economy systems
+* Mini-games
+* Statistics systems
+* Notification systems
+* Quest systems
+* Server utilities
+* Gameplay prototypes
+
+## Contributing
+
+Contributions are welcome.
+
+To contribute:
+
+1. Fork the repository
+2. Create a feature branch
+
+```bash
+git checkout -b feature/my-feature
+```
+
+3. Commit your changes
+
+```bash
+git commit -m "Add my feature"
+```
+
+4. Push your branch
+
+```bash
+git push origin feature/my-feature
+```
+
+5. Open a pull request
+
+Please keep contributions focused and include relevant documentation when introducing new functionality.
+
+## Support
+
+If you encounter a bug or have a feature request, open an issue in the repository.
+
+## License
+
+NanoScripter is licensed under the **MIT License**.
+
+See [`LICENSE`](LICENSE) for the complete license text.
+
+## Author
+
+**Cuubiq**
+
+Website: [cuubiq.cc](https://cuubiq.cc/?utm_source=chatgpt.com)
+
+GitHub: [@cuubiq](https://github.com/cuubiq?utm_source=chatgpt.com)
+
 ---
 
-## 📝 Lizenz
-
-Dieses Projekt ist unter der [MIT License](LICENSE) lizenziert.
-
----
-
-## 🤝 Contributing
-
-Contributions sind willkommen! Erstelle gerne Issues oder Pull Requests.
-
-1. Fork das Projekt
-2. Erstelle einen Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit deine Änderungen (`git commit -m 'Add some AmazingFeature'`)
-4. Push zum Branch (`git push origin feature/AmazingFeature`)
-5. Öffne einen Pull Request
-
----
-
-## 💡 Ideen für Plugins
-
-- 🏠 Custom Home/Warp System
-- ⚔️ Custom Combat System
-- 🛡️ Anti-Griefing Tools
-- 💰 Economy System
-- 🎲 Mini-Games
-- 📊 Statistics Tracker
-- 🔔 Custom Notifications
-- 🎯 Quest System
-
----
-
-## 📧 Support
-
-Bei Fragen oder Problemen:
-- Erstelle ein [Issue](https://github.com/ItzCubiq/NanoScripter/issues)
-
----
-
-**Made with ❤️ by ItzCubiq**
-
-*Entwickle Minecraft-Plugins so einfach wie nie zuvor!*
+**NanoScripter — write, reload, and run Minecraft plugins without the traditional development workflow.**
